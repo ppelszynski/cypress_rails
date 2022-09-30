@@ -37,10 +37,12 @@ jobs:
         run: bundle exec gem install bundler && bundle install
       - name: Setup database
         run: bundle exec rake db:drop db:create db:migrate
-      - name: Cypress run
-        uses: cypress-io/github-action@v2.2.7
-        with:
-          start: bundle exec rails server -e test -p 5002
-          wait-on: 'http://localhost:5002'
-          browser: chrome
-          headless: true
+      - name: Start server in the background
+        run: |
+          CYPRESS=1 bin/rails server -p 5017 &
+          sleep 5 &&
+          curl http://localhost:5017 -I
+      - name: Yarn
+        run: yarn
+      - name: Cypress
+        run: yarn run cypress run
