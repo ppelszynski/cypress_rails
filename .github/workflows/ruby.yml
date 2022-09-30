@@ -1,0 +1,46 @@
+name: CI
+on: [push]
+env:
+  DATABASE_URL: postgres://postgres:postgres@localhost:5432/betteroff_test
+  RAILS_ENV: test
+  RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
+  DISABLE_SPRING: 1
+jobs:
+  cypress:
+    runs-on: ubuntu-latest
+    env:
+      working-directory: ./provider
+    services:
+      db:
+        image: postgres:11-alpine
+        ports: ['5432:5432']
+        options: >-
+          --mount type=tmpfs,destination=/var/lib/postgresql/data
+          --health-cmd pg_isready
+          --health-interval 10ms
+          --health-timeout 500ms
+          --health-retries 15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: pact_provider_test
+    steps:
+      - uses: actions/checkout@v2
+      - name: Fetch master for git diff
+        run: git fetch --depth=1 origin +refs/heads/master:refs/remotes/origin/master
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.0.0
+          bundler-cache: true
+      - name: install gems
+        run: bundle exec gem install bundler && bundle install
+      - name: Setup database
+        run: bundle exec rake db:drop db:create db:migrate
+      - name: Cypress run
+        uses: cypress-io/github-action@v2.2.7
+        with:
+          start: bundle exec rails server -e test -p 5002
+          wait-on: 'http://localhost:5002'
+          browser: chrome
+          headless: true

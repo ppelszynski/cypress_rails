@@ -1,0 +1,20 @@
+development:
+  host: localhost
+  adapter: postgresql
+  encoding: unicode
+  database: <%= ENV['CYPRESS'] ? 'cypress_test' : 'cypress_development' %>
+  pool: 5
+  username: postgres
+  password: postgres
+  template: template0
+  port: 5432
+test:
+  host: localhost
+  adapter: postgresql
+  database: cypress_test
+  encoding: unicode
+  pool: 5
+  username: postgres
+  password: postgres
+  template: template0
+  port: 5432

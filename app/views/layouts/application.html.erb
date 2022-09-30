@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Cypress</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body>
+    <% if current_user.present? %>
+      <%= link_to 'sign out', destroy_user_session_path %>
+
+      <%= link_to 'posts', posts_path %>
+    <% else %>
+      <%= link_to 'sign in', new_user_session_path %>
+      <%= link_to 'sign up', new_user_registration_path %>
+    <% end %>
+
+    <%= yield %>
+  </body>
+</html>
